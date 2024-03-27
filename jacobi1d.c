@@ -61,7 +61,7 @@ void write_solution(int n, double* u, const char* fname)
 
 int main(int argc, char** argv)
 {
-    int i;
+    int i, procesos;
     int n, nsteps;
     double* u;
     double* f;
@@ -70,10 +70,11 @@ int main(int argc, char** argv)
     char* fname;
 
     /* Process arguments */
-    n      = (argc > 1) ? atoi(argv[1]) : 100;
-    nsteps = (argc > 2) ? atoi(argv[2]) : 100;
-    fname  = (argc > 3) ? argv[3] : NULL;
-    h      = 1.0/n;
+    n        = (argc > 1) ? atoi(argv[1]) : 100;
+    nsteps   = (argc > 2) ? atoi(argv[2]) : 100;
+    procesos = (argc > 3) ? atoi(argv[3]) : 1;
+    fname    = (argc > 4) ? argv[4] : NULL;
+    h        = 1.0/n;
 
 
     //Crear memoria compartida
@@ -95,10 +96,10 @@ int main(int argc, char** argv)
 
     //Calculando segementos de vector
     //Todo: Aqui se calcula los segementos que se repartiran entre los diferentes procesos
-    int p_r = (int)floor(n / CORES);
+    int p_r = (int)floor(n / procesos);
     int step = p_r == 0 ? 1 : p_r;
-    int r_step = n % CORES;
-    int lim = (p_r == 0) ? r_step : CORES;
+    int r_step = n % procesos;
+    int lim = (p_r == 0) ? r_step : procesos;
 
 
     /* Run the solver */
@@ -109,7 +110,7 @@ int main(int argc, char** argv)
 
     pid_t pid = 1;
 
-    for(int i = 0; i < CORES; i++){
+    for(int i = 0; i < procesos; i++){
         if(pid){
             pid = fork();
         }else if(pid < 0){
@@ -117,29 +118,23 @@ int main(int argc, char** argv)
         }
 
         if(pid == 0){
-            clock_t child_ts = clock();
             jacobi(nsteps, n, u, f,
             i*step,
-            ((CORES - 1) == i) ? (i*step + r_step + step): (i*step + step));
-            clock_t child_fs = clock();
-            double tt = (double)(child_fs - child_ts) / CLOCKS_PER_SEC;
-            printf("Tiempo -> %f Process -> %d\n",tt,getpid());
+            ((procesos - 1) == i) ? (i*step + r_step + step): (i*step + step));
             exit(0);
         }
 
     }
 
-    for(int i = 0; i < CORES; i++){
+    for(int i = 0; i < procesos; i++){
         wait(NULL);
     }
     //Obtener tiempo de finalizacion de proceso
     get_time(&tend);
 
     /* Run the solver */    
-    printf("n: %d\n"
-           "nsteps: %d\n"
-           "Elapsed time: %g s\n", 
-           n, nsteps, timespec_diff(tstart, tend));
+    printf("%g\n", 
+           timespec_diff(tstart, tend));
 
     /* Write the results */
     if (fname)
