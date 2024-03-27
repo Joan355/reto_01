@@ -33,12 +33,15 @@ void jacobi(int nsweeps, int n, double* u, double* f, int start, int end)
     for (sweep = 0; sweep < nsweeps; sweep += 2) {
         
         /* Old data in u; new data in utmp */
-        for (i = start + 1; i < end + 1; ++i)
+        for (i = start + 1; i < end + 1; ++i){
             utmp[i] = (u[i-1] + u[i+1] + h2*f[i])/2;
+            
+        }
         
         /* Old data in utmp; new data in u */
         for (i = start + 1; i < end + 1; ++i)
             u[i] = (utmp[i-1] + utmp[i+1] + h2*f[i])/2;
+            printf("%f\n",u[i]);
     }
 
     free(utmp);
@@ -114,9 +117,13 @@ int main(int argc, char** argv)
         }
 
         if(pid == 0){
+            clock_t child_ts = clock();
             jacobi(nsteps, n, u, f,
             i*step,
             ((CORES - 1) == i) ? (i*step + r_step + step): (i*step + step));
+            clock_t child_fs = clock();
+            double tt = (double)(child_fs - child_ts) / CLOCKS_PER_SEC;
+            printf("Tiempo -> %f Process -> %d\n",tt,getpid());
             exit(0);
         }
 
