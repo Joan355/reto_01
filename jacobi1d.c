@@ -41,7 +41,7 @@ void jacobi(int nsweeps, int n, double* u, double* f, int start, int end)
         /* Old data in utmp; new data in u */
         for (i = start + 1; i < end + 1; ++i)
             u[i] = (utmp[i-1] + utmp[i+1] + h2*f[i])/2;
-            printf("%f\n",u[i]);
+            //printf("%f\n",u[i]);
     }
 
     free(utmp);

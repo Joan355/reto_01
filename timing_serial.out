@@ -1,0 +1,9 @@
+Tiempo -> 0.006722 Process -> 16124
+Tiempo -> 0.007126 Process -> 16126
+Tiempo -> 0.010590 Process -> 16125
+Tiempo -> 0.010426 Process -> 16127
+Tiempo -> 0.011658 Process -> 16123
+Tiempo -> 0.011439 Process -> 16128
+n: 100000
+nsteps: 1000
+Elapsed time: 0.001234 s
