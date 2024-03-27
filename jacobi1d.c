@@ -79,10 +79,8 @@ int main(int argc, char** argv)
     get_time(&tend);
 
     /* Run the solver */    
-    printf("n: %d\n"
-           "nsteps: %d\n"
-           "Elapsed time: %g s\n", 
-           n, nsteps, timespec_diff(tstart, tend));
+    printf("%g\n", 
+           timespec_diff(tstart, tend));
 
     /* Write the results */
     if (fname)
